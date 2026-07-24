@@ -1,0 +1,182 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - driver-service
+      - booking-service
+      - payment-service
+      - notification-service
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - USER_SERVICE_URL=http://user-service:5000
+      - DRIVER_SERVICE_URL=http://driver-service:5001
+      - BOOKING_SERVICE_URL=http://booking-service:3001
+      - PAYMENT_SERVICE_URL=http://payment-service:3002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5002
+    networks:
+      - ride-share-network
+
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    environment:
+      - PORT=5000
+      - HOST=0.0.0.0
+      - ENVIRONMENT=development
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=ride_share_db
+      - DB_PORT=3306
+      - DEBUG=True
+    networks:
+      - ride-share-network
+
+  driver-service:
+    build: ./services/driver-service
+    container_name: driver-service
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mysql
+    environment:
+      - PORT=5001
+      - HOST=0.0.0.0
+      - ENVIRONMENT=development
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=ride_share_db
+      - DB_PORT=3306
+      - DEBUG=True
+    networks:
+      - ride-share-network
+
+  booking-service:
+    build: ./services/booking-service
+    container_name: booking-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/ride_share_db
+      - MONGO_DB_NAME=ride_share_db
+      - API_GATEWAY_URL=http://api-gateway:3000
+      - USER_SERVICE_URL=http://user-service:5000
+      - DRIVER_SERVICE_URL=http://driver-service:5001
+      - PAYMENT_SERVICE_URL=http://payment-service:3002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5002
+    networks:
+      - ride-share-network
+
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo
+    environment:
+      - PORT=3002
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/ride_share_db
+      - MONGO_DB_NAME=ride_share_db
+      - API_GATEWAY_URL=http://api-gateway:3000
+      - USER_SERVICE_URL=http://user-service:5000
+      - DRIVER_SERVICE_URL=http://driver-service:5001
+      - PAYMENT_SERVICE_URL=http://payment-service:3002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5002
+    networks:
+      - ride-share-network
+
+  notification-service:
+    build: ./services/notification-service
+    container_name: notification-service
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    depends_on:
+      - redis
+    environment:
+      - PORT=5002
+      - HOST=0.0.0.0
+      - ENVIRONMENT=development
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=dreamforaim26@gmail.com
+      - SMTP_PASSWORD=theappleceo
+      - SMTP_FROM_EMAIL=noreply@ride-share.com
+      - SMS_API_KEY=your_sms_api_key
+      - DEBUG=True
+      - MAX_RETRIES=3
+      - NOTIFICATION_TIMEOUT=30
+    networks:
+      - ride-share-network
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    networks:
+      - ride-share-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=ride_share_db
+
+  mongo:
+    image: mongo:6.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin_password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ride-share-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ride-share-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+networks:
+  ride-share-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  mongo_data:
+  redis_data:
