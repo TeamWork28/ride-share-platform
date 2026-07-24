@@ -1,5 +1,8 @@
 version: '3.8'
 
+env_file:
+  - .env
+
 services:
   api-gateway:
     build: ./services/api-gateway
@@ -125,8 +128,8 @@ services:
       - REDIS_DB=0
       - SMTP_SERVER=smtp.gmail.com
       - SMTP_PORT=587
-      - SMTP_USERNAME=dreamforaim26@gmail.com
-      - SMTP_PASSWORD=theappleceo
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM_EMAIL=noreply@ride-share.com
       - SMS_API_KEY=your_sms_api_key
       - DEBUG=True
