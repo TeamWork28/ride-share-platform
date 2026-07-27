@@ -42,3 +42,21 @@
 
 # \## Project Structure
 
+# \## Frontend
+
+# A Gen Z-style frontend lives in `frontend/`.
+
+# To run it locally:
+
+# 1. Open `frontend/config.js`
+# 2. Add your `googleMapsApiKey` or `appleMapsToken`
+# 3. Start the static server:
+
+# ```bash
+# node frontend/server.js
+# ```
+
+# Then open `http://localhost:4173`
+
+# The frontend talks to the existing API gateway at `http://localhost:3000/api`.
+

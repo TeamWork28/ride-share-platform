@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RideShare — Your city, on demand</title>
+    <meta name="description" content="Book a ride instantly. Real-time map and instant booking." />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./config.js"></script>
+  </head>
+  <body>
+
+    <!-- ── Full-screen map ──────────────────────────────────────── -->
+    <div id="map" aria-label="Live map view">
+      <div class="map-placeholder" id="mapPlaceholder">
+        <div class="map-placeholder-inner">
+          <div class="map-icon-wrap">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </div>
+          <h2 class="map-placeholder-title">Map ready to launch</h2>
+          <p class="map-placeholder-copy">
+            Add your <code>googleMapsApiKey</code> in <code>frontend/config.js</code><br/>
+            and refresh to see the live map.
+          </p>
+          <a href="https://console.cloud.google.com/google/maps-apis/overview" target="_blank" rel="noopener" class="btn-get-key">
+            Get API Key →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Background orbs ──────────────────────────────────────── -->
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+
+    <!-- ── Floating topbar ──────────────────────────────────────── -->
+    <header class="topbar glass" id="topbar">
+      <div class="topbar-brand">
+        <div class="brand-mark" aria-hidden="true">RS</div>
+        <span class="brand-name">RideShare</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="status-pill" id="apiPill">
+          <span class="pulse-dot" id="apiDot"></span>
+          <span id="apiStatusText">Connecting…</span>
+        </div>
+        <div class="status-pill muted-pill">
+          <span id="mapStatusText">Map: –</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Bottom sheet ──────────────────────────────────────────── -->
+    <div class="sheet glass" id="sheet" aria-label="Booking panel">
+
+      <!-- Handle / peek row -->
+      <div class="sheet-handle-zone" id="sheetHandleZone"
+           role="button" aria-expanded="false" aria-controls="sheetBody" tabindex="0">
+        <div class="sheet-handle"></div>
+        <div class="sheet-peek">
+          <div class="where-to-label">Where to?</div>
+          <div class="peek-inputs">
+            <input
+              type="text" id="peekPickup" class="peek-input"
+              placeholder="Pickup location" autocomplete="off" aria-label="Pickup location"
+            />
+            <div class="peek-arrow" aria-hidden="true">→</div>
+            <input
+              type="text" id="peekDropoff" class="peek-input"
+              placeholder="Dropoff location" autocomplete="off" aria-label="Dropoff location"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Full booking form -->
+      <div class="sheet-body" id="sheetBody">
+        <form id="bookingForm" class="booking-form" novalidate>
+
+          <div class="form-row">
+            <label class="form-label" for="inputPickup">
+              <span class="dot dot-green"></span> Pickup
+            </label>
+            <input
+              type="text" id="inputPickup" name="pickup" class="form-input"
+              placeholder="Koramangala, Bengaluru" value="Koramangala"
+              autocomplete="off" aria-label="Pickup location"
+            />
+          </div>
+
+          <div class="form-connector" aria-hidden="true">
+            <div class="connector-line"></div>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label" for="inputDropoff">
+              <span class="dot dot-white"></span> Dropoff
+            </label>
+            <input
+              type="text" id="inputDropoff" name="dropoff" class="form-input"
+              placeholder="Indiranagar, Bengaluru" value="Indiranagar"
+              autocomplete="off" aria-label="Dropoff location"
+            />
+          </div>
+
+          <!-- Route info strip — appears after Directions API responds -->
+          <div class="route-info hidden" id="routeInfo">
+            <div class="route-info-item">
+              <span>Distance</span>
+              <strong id="routeDistance">–</strong>
+            </div>
+            <div class="route-info-item">
+              <span>ETA</span>
+              <strong id="routeEta">–</strong>
+            </div>
+            <div class="route-info-item">
+              <span>Fare</span>
+              <strong id="routeFareEstimate">–</strong>
+            </div>
+          </div>
+
+          <div class="form-row fare-row">
+            <label class="form-label" for="inputFare">₹ Fare</label>
+            <input
+              type="number" id="inputFare" name="fare" class="form-input fare-input"
+              min="1" value="450" aria-label="Fare amount"
+            />
+          </div>
+
+          <button type="submit" class="btn-book" id="btnBook">
+            <span class="btn-book-text">Book Ride</span>
+            <span class="btn-book-icon" aria-hidden="true">→</span>
+          </button>
+
+          <p class="booking-result" id="bookingResult"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
