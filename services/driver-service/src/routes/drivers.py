@@ -218,16 +218,16 @@ async def rate_driver(driver_id: int, rating: DriverRating):
             raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
         
         # Get current driver stats
-        select_query = "SELECT rating, total_rides FROM drivers WHERE id = %s"
-        cursor.execute(select_query, (driver_id,))
+        stats_query = "SELECT rating, total_rides FROM drivers WHERE id = %s"
+        cursor.execute(stats_query, (driver_id,))
         driver = cursor.fetchone()
         
         if not driver:
             raise HTTPException(status_code=404, detail="Driver not found")
         
         # Calculate new average rating
-        current_rating = driver['rating']
-        current_rides = driver['total_rides']
+        current_rating = float(driver['rating'])
+        current_rides = int(driver['total_rides'])
         new_rides = current_rides + 1
         new_rating = ((current_rating * current_rides) + rating.rating) / new_rides
         
@@ -241,6 +241,7 @@ async def rate_driver(driver_id: int, rating: DriverRating):
         connection.commit()
         
         # Fetch and return updated driver
+        select_query = "SELECT * FROM drivers WHERE id = %s"
         cursor.execute(select_query, (driver_id,))
         updated_driver = cursor.fetchone()
         
