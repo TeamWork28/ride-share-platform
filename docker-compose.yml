@@ -1,8 +1,5 @@
 version: '3.8'
 
-env_file:
-  - .env
-
 services:
   api-gateway:
     build: ./services/api-gateway
@@ -131,7 +128,6 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM_EMAIL=noreply@ride-share.com
-      - SMS_API_KEY=your_sms_api_key
       - DEBUG=True
       - MAX_RETRIES=3
       - NOTIFICATION_TIMEOUT=30
@@ -140,8 +136,6 @@ services:
 
   mysql:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
     restart: unless-stopped
     networks:
       - ride-share-network

@@ -24,7 +24,7 @@ router.get('/users', async (req, res) => {
 router.post('/users', async (req, res) => {
   try {
     const response = await axios.post(
-      `${process.env.USER_SERVICE_URL}/users`,
+      `${process.env.USER_SERVICE_URL}/users/register`,
       req.body
     );
     res.status(201).json(response.data);
@@ -47,6 +47,20 @@ router.get('/drivers', async (req, res) => {
   } catch (error) {
     console.error('Error fetching drivers:', error.message);
     res.status(500).json({ error: 'Failed to fetch drivers' });
+  }
+});
+
+// POST /api/drivers - Register new driver
+router.post('/drivers', async (req, res) => {
+  try {
+    const response = await axios.post(
+      `${process.env.DRIVER_SERVICE_URL}/drivers/register`,
+      req.body
+    );
+    res.status(201).json(response.data);
+  } catch (error) {
+    console.error('Error creating driver:', error.message);
+    res.status(500).json({ error: 'Failed to create driver' });
   }
 });
 

@@ -4,17 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from typing import Optional
 
-from .queue import test_redis_connection, queue_notification
+from .queue import test_redis_connection
 from .services.email import EmailService
-from .services.sms import SMSService
 
 load_dotenv()
 
 app = FastAPI(
     title="Notification Service",
-    description="Microservice for sending notifications (email/SMS) in Ride-Share Platform",
+    description="Microservice for sending email notifications in Ride-Share Platform",
     version="1.0.0"
 )
 
@@ -34,10 +32,6 @@ class EmailNotification(BaseModel):
     body: str
     is_html: bool = False
 
-class SMSNotification(BaseModel):
-    phone_number: str
-    message: str
-
 class BookingConfirmation(BaseModel):
     user_email: str
     booking_details: dict
@@ -45,11 +39,6 @@ class BookingConfirmation(BaseModel):
 class PaymentReceipt(BaseModel):
     user_email: str
     payment_details: dict
-
-class RideStatusUpdate(BaseModel):
-    phone_number: str
-    status: str
-    driver_name: Optional[str] = None
 
 # ============ STARTUP EVENT ============
 @app.on_event("startup")
@@ -120,62 +109,6 @@ async def send_payment_receipt(notification: PaymentReceipt):
             return {"message": "Payment receipt email sent"}
         else:
             raise HTTPException(status_code=500, detail="Failed to send email")
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# ============ SMS ENDPOINTS ============
-@app.post("/sms/send")
-async def send_sms(notification: SMSNotification):
-    """
-    Send a custom SMS notification.
-    """
-    try:
-        success = SMSService.send_sms(
-            notification.phone_number,
-            notification.message
-        )
-        
-        if success:
-            return {"message": "SMS sent successfully"}
-        else:
-            raise HTTPException(status_code=500, detail="Failed to send SMS")
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/sms/otp")
-async def send_otp(phone_number: str, otp_code: str):
-    """
-    Send OTP verification code via SMS.
-    """
-    try:
-        success = SMSService.send_otp(phone_number, otp_code)
-        
-        if success:
-            return {"message": "OTP sent successfully"}
-        else:
-            raise HTTPException(status_code=500, detail="Failed to send OTP")
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/sms/ride-status")
-async def send_ride_status(notification: RideStatusUpdate):
-    """
-    Send ride status update SMS.
-    """
-    try:
-        success = SMSService.send_ride_status_update(
-            notification.phone_number,
-            notification.status,
-            notification.driver_name
-        )
-        
-        if success:
-            return {"message": "Status update SMS sent"}
-        else:
-            raise HTTPException(status_code=500, detail="Failed to send SMS")
             
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

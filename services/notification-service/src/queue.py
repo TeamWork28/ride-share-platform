@@ -50,7 +50,7 @@ app.conf.update(
 def queue_notification(notification_type, data):
     """
     Queue a notification task in Redis.
-    notification_type: 'email', 'sms', or 'both'
+    notification_type: 'email'
     data: Dictionary with recipient, message, etc.
     """
     try:
