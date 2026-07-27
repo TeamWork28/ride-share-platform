@@ -2,7 +2,22 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/ride_share_db';
+const DEFAULT_DB_NAME = process.env.MONGO_DB_NAME || 'ride_share_db';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  (() => {
+    const host = process.env.MONGO_HOST || 'localhost';
+    const port = process.env.MONGO_PORT || '27017';
+    const user = process.env.MONGO_USER;
+    const password = process.env.MONGO_PASSWORD;
+    const authSource = process.env.MONGO_AUTH_SOURCE || 'admin';
+
+    if (user && password) {
+      return `mongodb://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${DEFAULT_DB_NAME}?authSource=${authSource}`;
+    }
+
+    return `mongodb://${host}:${port}/${DEFAULT_DB_NAME}`;
+  })();
 
 async function connectDB() {
   /**

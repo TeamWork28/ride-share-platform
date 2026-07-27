@@ -1,9 +1,9 @@
 // Payment routes - API endpoints
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 const Payment = require('../models/Payment');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const isDevMode = !process.env.STRIPE_SECRET_KEY || process.env.NODE_ENV !== 'production';
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 // ============ CREATE PAYMENT ============
 router.post('/', async (req, res) => {
@@ -62,11 +62,7 @@ router.post('/:id/process', async (req, res) => {
    */
   try {
     const { token } = req.body;
-    
-    if (!token) {
-      return res.status(400).json({ error: 'Payment token required' });
-    }
-    
+
     const payment = await Payment.findById(req.params.id);
     
     if (!payment) {
@@ -76,7 +72,21 @@ router.post('/:id/process', async (req, res) => {
     if (payment.status !== 'pending') {
       return res.status(400).json({ error: 'Payment already processed' });
     }
-    
+
+    if (isDevMode) {
+      payment.status = 'completed';
+      payment.transactionId = `dev_tx_${Date.now()}`;
+      payment.completedAt = new Date();
+      payment.payoutStatus = 'pending';
+
+      const updatedPayment = await payment.save();
+
+      return res.json({
+        message: 'Payment processed successfully (dev mode)',
+        payment: updatedPayment,
+      });
+    }
+
     try {
       // Process payment with Stripe
       const charge = await stripe.charges.create({
@@ -85,27 +95,27 @@ router.post('/:id/process', async (req, res) => {
         source: token,
         description: `Booking ${payment.bookingId} - Ride-Share Platform`,
       });
-      
+
       // Update payment status
       payment.status = 'completed';
       payment.transactionId = charge.id;
       payment.completedAt = new Date();
       payment.payoutStatus = 'pending';
-      
+
       const updatedPayment = await payment.save();
-      
+
       res.json({
         message: 'Payment processed successfully',
         payment: updatedPayment,
       });
-      
+
     } catch (stripeError) {
       console.error('Stripe error:', stripeError);
-      
+
       payment.status = 'failed';
       payment.failedAt = new Date();
       await payment.save();
-      
+
       res.status(400).json({
         error: 'Payment processing failed',
         details: stripeError.message,
@@ -201,26 +211,40 @@ router.post('/:id/refund', async (req, res) => {
     if (payment.status !== 'completed') {
       return res.status(400).json({ error: 'Only completed payments can be refunded' });
     }
-    
+
+    if (isDevMode) {
+      payment.status = 'refunded';
+      payment.refundAmount = payment.totalAmount;
+      payment.refundReason = reason || 'dev refund';
+      payment.refundedAt = new Date();
+
+      const updatedPayment = await payment.save();
+
+      return res.json({
+        message: 'Payment refunded successfully (dev mode)',
+        payment: updatedPayment,
+      });
+    }
+
     try {
       // Refund via Stripe
-      const refund = await stripe.refunds.create({
+      await stripe.refunds.create({
         charge: payment.transactionId,
       });
-      
+
       // Update payment
       payment.status = 'refunded';
       payment.refundAmount = payment.totalAmount;
       payment.refundReason = reason;
       payment.refundedAt = new Date();
-      
+
       const updatedPayment = await payment.save();
-      
+
       res.json({
         message: 'Payment refunded successfully',
         payment: updatedPayment,
       });
-      
+
     } catch (stripeError) {
       console.error('Stripe refund error:', stripeError);
       res.status(400).json({

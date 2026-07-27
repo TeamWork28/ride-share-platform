@@ -13,6 +13,7 @@ SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
 SMTP_USERNAME = os.getenv('SMTP_USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')
 SMTP_FROM_EMAIL = os.getenv('SMTP_FROM_EMAIL', 'noreply@ride-share.com')
+IS_DEV_MODE = os.getenv('NODE_ENV', 'development') != 'production'
 
 class EmailService:
     """
@@ -34,6 +35,10 @@ class EmailService:
         Returns:
             bool: True if sent successfully, False otherwise
         """
+        if IS_DEV_MODE or not SMTP_USERNAME or not SMTP_PASSWORD:
+            print(f"✅ Email simulated to {to_email}: {subject}")
+            return True
+
         try:
             # Create message
             msg = MIMEMultipart()
