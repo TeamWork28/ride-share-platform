@@ -34,7 +34,7 @@
 
 **Ride-Share Platform** is a cloud-native, microservices-based ride-sharing application built to demonstrate **real-world DevOps engineering**. It covers the full software lifecycle — from local development to containerized deployment on AWS using Kubernetes, with a CI/CD pipeline powered by Jenkins.
 
-This project is not a toy. It's architected the same way production systems at scale are built:
+This project is not a sample. It's architected the same way production systems at scale are built:
 
 - **Decoupled services** — each domain owns its data and logic independently
 - **Infrastructure as Code** — all cloud resources are provisioned via Terraform, not consoles
@@ -48,7 +48,7 @@ This project is not a toy. It's architected the same way production systems at s
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │                            CLIENT LAYER                                │
-│                     Gen Z Frontend  (port 4173)                        │
+│                      Frontend (port 4173)                              │
 └──────────────────────────────┬─────────────────────────────────────────┘
                                │ HTTP
                                ▼
@@ -71,7 +71,7 @@ This project is not a toy. It's architected the same way production systems at s
        └──────────────┴──────────────┴───────────────┘
                                │
                     ┌──────────▼──────────┐
-                    │   PostgreSQL / DBs  │
+                    │   MySQL & Mongo     │
                     │   (StatefulSets)    │
                     └─────────────────────┘
 ```
@@ -83,11 +83,11 @@ This project is not a toy. It's architected the same way production systems at s
 | Service | Responsibility | Port |
 |---------|---------------|------|
 | **API Gateway** | Routes all incoming requests, handles authentication and rate limiting | `3000` |
-| **User Service** | Registration, login, profile management, JWT issuance | — |
-| **Booking Service** | Create, track, cancel, and complete ride bookings | — |
-| **Driver Service** | Driver onboarding, availability, location tracking | — |
-| **Payment Service** | Fare calculation, payment processing, receipts | — |
-| **Notification Service** | Push, email, and SMS notifications for ride events | — |
+| **Booking Service** | Create, track, cancel, and complete ride bookings | 3001 |
+| **Payment Service** | Fare calculation, payment processing, receipts | 3002 |
+| **User Service** | Registration, login, profile management, JWT issuance | 5000 |
+| **Driver Service** | Driver onboarding, availability, location tracking | 5001 |
+| **Notification Service** | Push, email, and SMS notifications for ride events | 5002 |
 
 Each service is independently deployable with its own Docker image, Kubernetes Deployment, and Service manifest.
 
@@ -95,7 +95,7 @@ Each service is independently deployable with its own Docker image, Kubernetes D
 
 ## 🖥️ Frontend
 
-A **Gen Z-style** ride-sharing frontend with real-time map integration.
+A **Trendy-style** ride-sharing frontend with real-time map integration.
 
 - **Location**: `frontend/`
 - **Server**: `node frontend/server.js`
@@ -109,8 +109,7 @@ A **Gen Z-style** ride-sharing frontend with real-time map integration.
 # 1. Configure your Maps API key
 #    Open frontend/config.js and set:
 #      googleMapsApiKey: "YOUR_KEY"
-#    or
-#      appleMapsToken: "YOUR_TOKEN"
+
 
 # 2. Start the server
 node frontend/server.js
@@ -128,7 +127,7 @@ open http://localhost:4173
       │
       ▼
  ┌─────────┐     ┌──────────────────┐     ┌─────────────────┐
- │ Jenkins │────▶│  Build & Test    │────▶│  Docker Build   │
+ │ Jenkins │────▶│  Build & Test    │────▶│  Docker Build  │
  │  CI/CD  │     │  each service    │     │  per service    │
  └─────────┘     └──────────────────┘     └────────┬────────┘
                                                    │
@@ -159,7 +158,7 @@ open http://localhost:4173
 ```
 ride-share-platform/
 │
-├── frontend/                    # Gen Z-style web frontend
+├── frontend/                    # Trendy-style web frontend
 │   ├── config.js                # Maps API key configuration
 │   └── server.js                # Static file server (port 4173)
 │
@@ -170,7 +169,7 @@ ride-share-platform/
 │   ├── configmaps/              # App config per service
 │   ├── deployments/             # Deployment manifests per service
 │   ├── services/                # ClusterIP / LoadBalancer definitions
-│   ├── statefulsets/            # Databases (PostgreSQL etc.)
+│   ├── statefulsets/            # Databases ( etc.)
 │   ├── pvc/                     # Persistent Volume Claims
 │   ├── ingress.yaml             # Ingress controller rules
 │   ├── namespaces.yaml          # Namespace definitions
