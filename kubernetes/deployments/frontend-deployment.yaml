@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: frontend
+  namespace: ride-share
+spec:
+  replicas: 3
+  selector:
+      labels:
+        app: frontend
+  template:
+    metadata:
+      matchLabels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/frontend
+          ports:
+            - containerPort: 4173

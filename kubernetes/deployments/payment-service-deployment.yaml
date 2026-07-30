@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: payment-service
+  namespace: ride-share
+spec:
+  replicas: 3
+  selector:
+      labels:
+        app: payment-service
+  template:
+    metadata:
+      matchLabels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/payment-service:latest
+          ports:
+            - containerPort: 3002
+          env:
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ride-share-platform
+                  key: MONGO_HOST
+            - name: MONGO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ride-share-platform
+                  key: MONGO_PORT
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: ride-share-platform
+                  key: MONGO_DB_NAME
+            - name: MONGO_USER
+              value: "admin"
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ride-share-mongodb-secrets
+                  key: MONGO_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 5

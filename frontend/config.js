@@ -1,13 +1,12 @@
 /**
  * Ride Share Studio — Frontend Configuration
  *
- * HOW TO ENABLE THE LIVE MAP:
- *  1. Go to https://console.cloud.google.com
- *  2. Create / open a project
- *  3. Enable: Maps JavaScript API, Places API, Directions API
- *  4. Create an API key and paste it below as googleMapsApiKey
+ * Map stack: Leaflet + OpenStreetMap (free, no API key required)
+ *  - Tiles:    OpenStreetMap public tile servers
+ *  - Routing:  OSRM public demo server (router.project-osrm.org)
+ *  - Geocoding: Nominatim public API (nominatim.openstreetmap.org)
  *
- * The UI works without a key — it shows a styled placeholder.
+ * None of these require signup, billing, or an API key.
  */
 window.RIDE_SHARE_CONFIG = {
   // ── Backend ────────────────────────────────────────────────────
@@ -21,16 +20,9 @@ window.RIDE_SHARE_CONFIG = {
   demoUserId: 5,
 
   // ── Map ────────────────────────────────────────────────────────
-  mapProvider: 'google',
-
-  // Paste your Google Maps API key here:
-  googleMapsApiKey: '',
-
-  // Apple MapKit (alternative — set mapProvider to 'apple')
-  appleMapsToken: '',
-
-  // Libraries to load with the Maps JS API
-  googleMapsLibraries: ['places'],
+  osmTileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  osrmBaseUrl: 'https://router.project-osrm.org',
+  nominatimBaseUrl: 'https://nominatim.openstreetmap.org',
 
   // Default map centre (Bengaluru, India)
   defaultCenter: { lat: 12.9716, lng: 77.5946 },

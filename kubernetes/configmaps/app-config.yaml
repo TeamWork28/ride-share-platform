@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ride-share-platform
+  namespace: ride-share
+data:
+  APP_ENV: dev
+MYSQL_DATABASE: "ride_share_db"
+DB_HOST: "mysql"
+DB_PORT: "3306"
+MONGO_DB_NAME: "ride_share_db"
+MONGO_HOST: "mongo"
+MONGO_PORT: "27017"
+REDIS_HOST: "redis"
+REDIS_PORT: "6379"

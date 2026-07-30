@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: ride-share
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers: 
+        - name: api-gateway
+          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/api-gateway:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: USER_SERVICE_URL
+              value: "http://user-service:5000"
+            - name: DRIVER_SERVICE_URL
+              value: "http://driver-service:5001"
+            - name: BOOKING_SERVICE_URL
+              value: "http://booking-service:3001"
+            - name: PAYMENT_SERVICE_URL
+              value: "http://payment-service:3002"
+            - name: NOTIFICATION_SERVICE_URL
+              value: "http://notification-service:5002"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+

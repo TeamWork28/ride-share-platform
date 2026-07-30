@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: ride-share
+spec:
+  replicas: 3
+  selector: 
+    labels:
+      app: notification-service
+  template:
+    metadata:
+      matchLabels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service 
+          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/notification-service:latest
+          ports:
+            - containerPort: 5002
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 10
+            periodSeconds: 5

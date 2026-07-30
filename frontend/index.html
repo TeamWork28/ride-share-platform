@@ -29,14 +29,10 @@
               <circle cx="12" cy="9" r="2.5"/>
             </svg>
           </div>
-          <h2 class="map-placeholder-title">Map ready to launch</h2>
+          <h2 class="map-placeholder-title">Loading map…</h2>
           <p class="map-placeholder-copy">
-            Add your <code>googleMapsApiKey</code> in <code>frontend/config.js</code><br/>
-            and refresh to see the live map.
+            Fetching OpenStreetMap tiles.
           </p>
-          <a href="https://console.cloud.google.com/google/maps-apis/overview" target="_blank" rel="noopener" class="btn-get-key">
-            Get API Key →
-          </a>
         </div>
       </div>
     </div>
@@ -116,7 +112,7 @@
             />
           </div>
 
-          <!-- Route info strip — appears after Directions API responds -->
+          <!-- Route info strip — appears after OSRM route responds -->
           <div class="route-info hidden" id="routeInfo">
             <div class="route-info-item">
               <span>Distance</span>

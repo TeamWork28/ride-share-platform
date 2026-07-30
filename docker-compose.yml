@@ -1,6 +1,13 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: ride-share-frontend
+    ports:
+      - "4173:4173"
+    restart: unless-stopped
+
   api-gateway:
     build: ./services/api-gateway
     container_name: api-gateway
