@@ -10,7 +10,7 @@
  */
 window.RIDE_SHARE_CONFIG = {
   // ── Backend ────────────────────────────────────────────────────
-  apiBaseUrl: 'http://localhost:3000/api',
+  apiBaseUrl: 'http://ride-share.local/api',
 
   // Dev auth token — matches the gateway's DEV_AUTH_TOKEN default.
   // Sent automatically on POST /bookings and POST /payments.

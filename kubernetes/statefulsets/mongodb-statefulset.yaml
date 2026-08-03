@@ -9,16 +9,16 @@ spec:
   selector:
     matchLabels:
       app: mongo
-    template:
-      metadata:
-        labels:
-          app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
     spec:
       containers:
         - name: mongo
           image: mongo:6.0
           ports:
-            - containerPort: 27017 
+            - containerPort: 27017
           env:
             - name: MONGO_INITDB_DATABASE
               valueFrom:
@@ -28,7 +28,7 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: "admin"
             - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom: 
+              valueFrom:
                 secretKeyRef:
                   name: ride-share-mongodb-secrets
                   key: MONGO_PASSWORD

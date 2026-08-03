@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata: 
+metadata:
   name: payment-service
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
-      labels:
-        app: payment-service
+    matchLabels:
+      app: payment-service
   template:
     metadata:
-      matchLabels:
+      labels:
         app: payment-service
     spec:
       containers:
         - name: payment-service
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/payment-service:latest
+          image: ride-share-payment-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3002
           env:

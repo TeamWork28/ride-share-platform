@@ -4,7 +4,7 @@ metadata:
   name: user-service
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: user-service
@@ -15,7 +15,8 @@ spec:
     spec:
       containers: 
         - name: user-service
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/user-service:latest
+          image: ride-share-user-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           env:
@@ -47,4 +48,5 @@ spec:
               port: 5000
             initialDelaySeconds: 10
             periodSeconds: 5
+
 

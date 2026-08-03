@@ -4,17 +4,19 @@ metadata:
   name: frontend
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
-      labels:
+      matchLabels:
         app: frontend
   template:
     metadata:
-      matchLabels:
+      labels:
         app: frontend
     spec:
       containers:
         - name: frontend
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/frontend
+          image: ride-share-frontend:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4173
+

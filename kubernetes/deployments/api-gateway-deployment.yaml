@@ -4,7 +4,7 @@ metadata:
   name: api-gateway
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -15,7 +15,8 @@ spec:
     spec:
       containers: 
         - name: api-gateway
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/api-gateway:latest
+          image: ride-share-api-gateway:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:
@@ -35,4 +36,5 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 5
+
 

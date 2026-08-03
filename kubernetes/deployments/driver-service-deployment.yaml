@@ -4,7 +4,7 @@ metadata:
   name: driver-service
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: driver-service
@@ -15,7 +15,8 @@ spec:
     spec:
       containers: 
         - name: driver-service
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/driver-service:latest
+          image: ride-share-driver-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5001
           env:
@@ -47,4 +48,5 @@ spec:
               port: 5001
             initialDelaySeconds: 10
             periodSeconds: 5
+
 

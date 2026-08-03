@@ -4,18 +4,19 @@ metadata:
   name: booking-service
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector:
-      labels:
+     matchLabels:
         app: booking-service
   template:
     metadata:
-      matchLabels:
+      labels:
         app: booking-service
     spec:
       containers:
         - name: booking-service
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/booking-service:latest
+          image: ride-share-booking-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
           env:
@@ -34,13 +35,6 @@ spec:
                 configMapKeyRef:
                   name: ride-share-platform
                   key: MONGO_DB_NAME
-            - name: MONGO_USER
-              value: "admin"
-            - name: MONGO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ride-share-mongodb-secrets
-                  key: MONGO_PASSWORD
           readinessProbe:
             httpGet:
               path: /health

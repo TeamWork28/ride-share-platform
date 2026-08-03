@@ -4,18 +4,19 @@ metadata:
   name: notification-service
   namespace: ride-share
 spec:
-  replicas: 3
+  replicas: 1
   selector: 
-    labels:
+    matchLabels:
       app: notification-service
   template:
     metadata:
-      matchLabels:
+      labels:
         app: notification-service
     spec:
       containers:
         - name: notification-service 
-          image: 628270103657.dkr.ecr.us-east-2.amazonaws.com/ride-share/notification-service:latest
+          image: ride-share-notification-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5002
           readinessProbe:
