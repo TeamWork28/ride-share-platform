@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   name: ride-share-ingress
   namespace: ride-share
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
