@@ -32,7 +32,7 @@ pipeline {
                   steps {
                         sh '''
                         sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/namespaces.yaml
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/configmaps.yaml
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/configmaps/
                         sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/secrets/
                         sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/services/
                         sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/pvc/
