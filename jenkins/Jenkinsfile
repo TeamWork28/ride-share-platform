@@ -1,80 +1,106 @@
 pipeline {
-      agent any
+    agent any
 
-      environment {
-            NAMESPACE = 'ride-share'
-            K8S_DIR = 'kubernetes'
-	    	RUN_AS = 'wsl'
-      }
-      stages {
-            stage('checkout') {
-                  steps {
-                        checkout scm
-                  }
+    environment {
+        NAMESPACE = 'ride-share'
+        K8S_DIR = 'kubernetes'
+        RUN_AS = 'wsl'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
             }
-            stage('Build Images') {
-                  steps {
-                        sh '''
-                              sudo -u ${RUN_AS} -E bash -c "
-                                    eval \\$(minikube docker-env) &&
-                                    docker build -t ride-share-api-gateway:latest ./services/api-gateway &&
-                                    docker build -t ride-share-user-service:latest ./services/user-service &&
-                                    docker build -t ride-share-driver-service:latest ./services/driver-service &&
-                                    docker build -t ride-share-booking-service:latest ./services/booking-service &&
-                                    docker build -t ride-share-payment-service:latest ./services/payment-service &&
-                                    docker build -t ride-share-notification-service:latest ./services/notification-service &&
-                                    docker build -t ride-share-frontend:latest ./frontend
-                              "
-                        '''
-                  }
+        }
+
+        stage('Build Images') {
+            steps {
+                sh '''
+                sudo -H -u ${RUN_AS} bash -c "
+                export HOME=/home/${RUN_AS}
+
+                eval \$(minikube docker-env)
+
+                docker build -t ride-share-api-gateway:latest ./services/api-gateway
+                docker build -t ride-share-user-service:latest ./services/user-service
+                docker build -t ride-share-driver-service:latest ./services/driver-service
+                docker build -t ride-share-booking-service:latest ./services/booking-service
+                docker build -t ride-share-payment-service:latest ./services/payment-service
+                docker build -t ride-share-notification-service:latest ./services/notification-service
+                docker build -t ride-share-frontend:latest ./frontend
+                "
+                '''
             }
-            stage('Apply K8s manifests'){
-                  steps {
-                        sh '''
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/namespaces.yaml
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/configmaps/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/secrets/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/services/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/pvc/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/statefulsets/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/deployments/
-                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/ingress.yaml
-                        '''                        
-                  }
+        }
+
+        stage('Apply K8s Manifests') {
+            steps {
+                sh '''
+                sudo -H -u ${RUN_AS} bash -c "
+                export HOME=/home/${RUN_AS}
+                export KUBECONFIG=/home/${RUN_AS}/.kube/config
+
+                kubectl apply -f ${K8S_DIR}/namespaces.yaml
+                kubectl apply -f ${K8S_DIR}/configmaps/
+                kubectl apply -f ${K8S_DIR}/secrets/
+                kubectl apply -f ${K8S_DIR}/services/
+                kubectl apply -f ${K8S_DIR}/pvc/
+                kubectl apply -f ${K8S_DIR}/statefulsets/
+                kubectl apply -f ${K8S_DIR}/ingress.yaml
+                kubectl apply -f ${K8S_DIR}/deployments/
+                "
+                '''
             }
-            stage('Rollout Restart images'){
-                  steps {
-                        sh '''
-                        kubectl rollout restart deployment api-gateway -n ${NAMESPACE}
-                        kubectl rollout restart deployment user-service -n ${NAMESPACE}
-                        kubectl rollout restart deployment driver-service -n ${NAMESPACE}
-                        kubectl rollout restart deployment booking-service -n ${NAMESPACE}
-                        kubectl rollout restart deployment payment-service -n ${NAMESPACE}
-                        kubectl rollout restart deployment notification-service -n ${NAMESPACE}
-                        kubectl rollout restart deployment frontend -n ${NAMESPACE}                        
-                        '''
-                  }
+        }
+
+        stage('Rollout Restart Images') {
+            steps {
+                sh '''
+                sudo -H -u ${RUN_AS} bash -c "
+                export HOME=/home/${RUN_AS}
+                export KUBECONFIG=/home/${RUN_AS}/.kube/config
+
+                kubectl rollout restart deployment api-gateway -n ${NAMESPACE}
+                kubectl rollout restart deployment user-service -n ${NAMESPACE}
+                kubectl rollout restart deployment driver-service -n ${NAMESPACE}
+                kubectl rollout restart deployment booking-service -n ${NAMESPACE}
+                kubectl rollout restart deployment payment-service -n ${NAMESPACE}
+                kubectl rollout restart deployment notification-service -n ${NAMESPACE}
+                kubectl rollout restart deployment frontend -n ${NAMESPACE}
+                "
+                '''
             }
-            stage('verify rollout'){
-                  steps{
-                        sh '''
-                        kubectl rollout status deployment api-gateway -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment user-service -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment driver-service -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment booking-service -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment payment-service -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment notification-service -n ${NAMESPACE} --timeout=90s
-                        kubectl rollout status deployment frontend -n ${NAMESPACE} --timeout=90s
-                        '''                      
-                  }
+        }
+
+        stage('Verify Rollout') {
+            steps {
+                sh '''
+                sudo -H -u ${RUN_AS} bash -c "
+                export HOME=/home/${RUN_AS}
+                export KUBECONFIG=/home/${RUN_AS}/.kube/config
+
+                kubectl rollout status deployment api-gateway -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment user-service -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment driver-service -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment booking-service -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment payment-service -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment notification-service -n ${NAMESPACE} --timeout=90s
+                kubectl rollout status deployment frontend -n ${NAMESPACE} --timeout=90s
+                "
+                '''
             }
-            }
-      post {
-            success {
-                  echo 'Pipeline completed'
-            }
-            failure {
-                  echo 'Pipeline failed'
-            }
-      }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
 }
