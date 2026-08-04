@@ -10,7 +10,7 @@
  */
 window.RIDE_SHARE_CONFIG = {
   // ── Backend ────────────────────────────────────────────────────
-  apiBaseUrl: 'http://ride-share.local/api',
+  apiBaseUrl: window.location.origin + '/api',
 
   // Dev auth token — matches the gateway's DEV_AUTH_TOKEN default.
   // Sent automatically on POST /bookings and POST /payments.
@@ -31,3 +31,4 @@ window.RIDE_SHARE_CONFIG = {
   // ── Brand ──────────────────────────────────────────────────────
   brandName: 'RideShare',
 };
+
