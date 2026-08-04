@@ -4,6 +4,7 @@ pipeline {
       environment {
             NAMESPACE = 'ride-share'
             K8S_DIR = 'kubernetes'
+	    RUN_AS = 'wsl'
       }
       stages {
             stage('checkout') {
