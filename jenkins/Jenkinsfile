@@ -12,22 +12,33 @@ pipeline {
                         checkout scm
                   }
             }
-            stage('connect Docker to Minikube') {
-                  steps {
-                        sh 'eval $(minikube docker-env) && docker info'
-                  }
-            }
-            stage('Build Images'){
+            stage('Build Images') {
                   steps {
                         sh '''
-                        kubectl apply -f ${K8S_DIR}/namespaces.yaml
-                        kubectl apply -f ${K8S_DIR}/configmaps.yaml
-                        kubectl apply -f ${K8S_DIR}/secrets/
-                        kubectl apply -f ${K8S_DIR}/services/
-                        kubectl apply -f ${K8S_DIR}/pvc/
-                        kubectl apply -f ${K8S_DIR}/statefulsets/
-                        kubectl apply -f ${K8S_DIR}/deployments/
-                        kubectl apply -f ${K8S_DIR}/ingress.yaml
+                              sudo -u ${RUN_AS} -E bash -c "
+                                    eval \\$(minikube docker-env) &&
+                                    docker build -t ride-share-api-gateway:latest ./services/api-gateway &&
+                                    docker build -t ride-share-user-service:latest ./services/user-service &&
+                                    docker build -t ride-share-driver-service:latest ./services/driver-service &&
+                                    docker build -t ride-share-booking-service:latest ./services/booking-service &&
+                                    docker build -t ride-share-payment-service:latest ./services/payment-service &&
+                                    docker build -t ride-share-notification-service:latest ./services/notification-service &&
+                                    docker build -t ride-share-frontend:latest ./frontend
+                              "
+                        '''
+                  }
+            }
+            stage('Apply K8s manifests'){
+                  steps {
+                        sh '''
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/namespaces.yaml
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/configmaps.yaml
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/secrets/
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/services/
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/pvc/
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/statefulsets/
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/deployments/
+                        sudo -u ${RUN_AS} kubectl apply -f ${K8S_DIR}/ingress.yaml
                         '''                        
                   }
             }
