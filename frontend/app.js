@@ -64,6 +64,15 @@ async function pingApi() {
   }
 }
 
+function startApiHealthCheck() {
+  const check = () => {
+    startApiHealthCheck();
+  };
+
+  check();
+  setInterval(check, 10000);
+}
+
 /* ── Booking form ────────────────────────────────────────────── */
 async function handleBooking(evt) {
   evt.preventDefault();
@@ -348,7 +357,7 @@ async function boot() {
   wireEvents();
 
   // Ping API (status dot only — no data panels)
-  pingApi();
+  startApiHealthCheck();
 
   // Load map (Leaflet + OpenStreetMap — no key, no signup)
   try {
